@@ -20,11 +20,31 @@ jsonfile.readFile(feedFile, function (err, obj) {
         let table = $('#div1').children().first();
         //console.log("Level 1 \r\n",$(table).children());
         $(table).children().each(function(i,trelems){
+          let constituency = new Object();
+          constituency["voteshare"] = [];
           $(trelems).children().each(function(idx,tdrows){
-            console.log("html l1 : ",$(tdrows).html())
-            $(tdrows).children().each(function(ind,rows){
-              console.log("html l2: ",ind," ",$(rows).html());
+            console.log("html l1 : ",idx,"  ",$(tdrows).html())            
+            let voteshare = new Object();
+            $(tdrows).children().each(function(ind,rows){              
+              if(idx == 0){
+                constituency["constituency"] = $(rows).text().trim();
+              }
+              if(idx > 2){
+                if(ind === 0){
+                  voteshare["candidate"] = $(rows).text();
+                } 
+                else if(ind === 1){
+                  voteshare["party"] = $(rows).text();
+                }
+                else if(ind === 2){
+                  voteshare["votes"] = $(rows).text();
+                }                                
+              }              
+              console.log("html l2: ",ind," ",$(rows).text());              
             });
+            console.log("voteshare :", voteshare);
+            constituency["voteshare"] = constituency["voteshare"].concat(voteshare);
+            console.log("Object : ", constituency)
             console.log('\r\n');
           });
           console.log("in each : ",i," ==> ", $(trelems).children().length);
