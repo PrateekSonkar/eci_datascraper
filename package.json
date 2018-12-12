@@ -4,6 +4,7 @@
   "description": "For Scarpping Data from ECI",
   "main": "scrapper.js",
   "dependencies": {
+    "async": "^2.6.1",
     "cheerio": "^1.0.0-rc.2",
     "jsonfile": "^5.0.0",
     "request": "^2.88.0"

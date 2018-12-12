@@ -1,15 +1,46 @@
 const request = require('request');
 const cheerio = require('cheerio');
 const jsonfile = require('jsonfile')
+const async = require('async');
 const feedFile = './inputsource.json';
-
+const objToWrite = [];
 
 jsonfile.readFile(feedFile, function (err, obj) {
   if (err) {
     console.error(err)
   }
   else {
+      async.eachOf(obj.stateinfo,function(value,key,callback){
+        //console.log("Value ", value);
+        //console.log("Key ", key);
+        let mappedItem = value.constituencyid.map(x =>({"statecode":value.statecode,"constituencyid":x}));
+        console.log("Mapped ", mappedItem);
+        async.eachOf(mappedItem,function(invalue,key,cb){          
+          let url = `http://eciresults.nic.in/Constituencywise${invalue.statecode}${invalue.constituencyid}.htm?ac=${invalue.constituencyid}`;
+          console.log("From Inner Loop : ", invalue, "\r\n", url);
+          request(url, function (error, response, body) {
+            if(error) {
+              console.log('error:', error); // Print the error if one occurred            
+            } else {
+              
+            }
+          });
+          cb()
+        },function(err){
+          if(err) console.log(err);
+        })
+        callback();
+      },function(err){
+        if(err) console.log(err);
+      });
+      //console.log("MAP : ", obj.stateinfo[noOfStates].constituencyid.map(x =>({"statecode":obj.stateinfo[noOfStates].statecode,"constituencyid":x}) ))
+      
+    
+
+
+
     //
+    /*
     let url = 'http://eciresults.nic.in/ConstituencywiseS2679.htm?ac=79';
     request(url, function (error, response, body) {
       if(error) {
@@ -21,7 +52,7 @@ jsonfile.readFile(feedFile, function (err, obj) {
         //console.log("Level 1 \r\n",$(table).children());
         $(table).children().each(function(i,trelems){
           let constituency = new Object();
-          constituency["voteshare"] = [];
+          constituency["voteshare"] = [];          
           $(trelems).children().each(function(idx,tdrows){
             console.log("html l1 : ",idx,"  ",$(tdrows).html())            
             let voteshare = new Object();
@@ -32,6 +63,7 @@ jsonfile.readFile(feedFile, function (err, obj) {
               if(idx > 2){
                 if(ind === 0){
                   voteshare["candidate"] = $(rows).text();
+                  voteshare["constituency"] = constituency.constituency;
                 } 
                 else if(ind === 1){
                   voteshare["party"] = $(rows).text();
@@ -43,8 +75,9 @@ jsonfile.readFile(feedFile, function (err, obj) {
               console.log("html l2: ",ind," ",$(rows).text());              
             });
             console.log("voteshare :", voteshare);
-            constituency["voteshare"] = constituency["voteshare"].concat(voteshare);
-            console.log("Object : ", constituency)
+            //constituency["voteshare"] = constituency["voteshare"].concat(voteshare);
+            //console.log("Object : ", constituency);
+            objToWrite.concat(voteshare);
             console.log('\r\n');
           });
           console.log("in each : ",i," ==> ", $(trelems).children().length);
@@ -54,7 +87,7 @@ jsonfile.readFile(feedFile, function (err, obj) {
       }          
       //console.log('statusCode:', response && response.statusCode); // Print the response status code if a response was received
       //console.log('body:', body); // Print the HTML for the Google homepage.  
-    });
+    });*/
     //
 
     /*for (let noOfStates = 0 ; noOfStates < obj.stateinfo.length; noOfStates ++){
@@ -82,6 +115,7 @@ jsonfile.readFile(feedFile, function (err, obj) {
         });
       }
     }   */
+    
   } 
 });
 
